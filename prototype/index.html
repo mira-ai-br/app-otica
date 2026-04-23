@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=390,initial-scale=1">
+<title>Ótica Nina — Protótipo v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --accent:   #0C5FA8;
+  --accent-d: #094A84;
+  --accent-l: #E0EEF8;
+  --bg:       #F2F2F7;
+  --card:     #FFFFFF;
+  --ink:      #1C1C1E;
+  --ink-2:    #48484A;
+  --ink-3:    #8E8E93;
+  --border:   #E5E5EA;
+  --green:    #34C759;
+  --orange:   #FF9F0A;
+  --red:      #FF3B30;
+  --radius:   16px;
+}
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: #111;
+  display: flex;
+  justify-content: center;
+  padding: 32px 0 64px;
+  min-height: 100vh;
+}
+
+/* ── Phone shell ── */
+.phone {
+  width: 390px;
+  background: var(--bg);
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: 0 60px 140px rgba(0,0,0,0.8), inset 0 0 0 1.5px rgba(255,255,255,0.08);
+  position: relative;
+}
+.status-bar {
+  background: var(--card);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 28px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.status-icons { display: flex; gap: 6px; align-items: center; }
+
+/* ── Screens ── */
+.screen { display: none; flex-direction: column; min-height: 820px; background: var(--bg); }
+.screen.active { display: flex; }
+.scroll { flex: 1; overflow-y: auto; }
+
+/* ── Nav bar ── */
+.nav {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 8px 0 20px;
+}
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 6px 4px;
+}
+.nav-btn svg { width: 22px; height: 22px; stroke-width: 1.8; }
+.nav-btn span { font-size: 10px; font-weight: 600; color: var(--ink-3); letter-spacing: 0.2px; }
+.nav-btn.on svg { stroke: var(--accent); }
+.nav-btn.on span { color: var(--accent); }
+.nav-btn svg { stroke: var(--ink-3); fill: none; }
+
+/* ── Page header ── */
+.pg-header {
+  background: var(--card);
+  padding: 16px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.pg-header h1 { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.5px; }
+.pg-header p  { font-size: 13px; color: var(--ink-3); margin-top: 2px; }
+
+/* ── Hero header (dashboard) ── */
+.hero {
+  background: var(--accent);
+  padding: 20px 22px 28px;
+  color: white;
+}
+.hero-greeting { font-size: 13px; font-weight: 500; opacity: 0.8; margin-bottom: 2px; }
+.hero-title { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+.hero-sub { font-size: 13px; opacity: 0.75; margin-top: 3px; }
+
+/* ── KPI cards ── */
+.kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 16px; margin-top: -16px; }
+.kpi {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+}
+.kpi-label { font-size: 11px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.6px; }
+.kpi-num { font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -1px; margin-top: 4px; line-height: 1; }
+.kpi-delta { font-size: 12px; color: var(--green); font-weight: 600; margin-top: 4px; }
+.kpi-delta.neg { color: var(--red); }
+
+/* ── Section header ── */
+.section-h {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 10px;
+}
+.section-h h2 { font-size: 15px; font-weight: 700; color: var(--ink); }
+.section-h a  { font-size: 13px; font-weight: 600; color: var(--accent); cursor: pointer; }
+
+/* ── Card ── */
+.card { background: var(--card); border-radius: var(--radius); padding: 16px; margin: 0 16px 10px; }
+.card-list { background: var(--card); border-radius: var(--radius); margin: 0 16px 10px; overflow: hidden; }
+
+/* ── List row ── */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+}
+.row:last-child { border-bottom: none; }
+.row:active { background: var(--bg); }
+
+/* ── Avatar ── */
+.av {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 15px;
+  flex-shrink: 0;
+  letter-spacing: -0.5px;
+}
+.av-purple { background: var(--accent-l); color: var(--accent); }
+.av-green  { background: #E8F9EE; color: #219653; }
+.av-gray   { background: #F2F2F7; color: #8E8E93; }
+.av-orange { background: #FFF3E0; color: var(--orange); }
+
+/* ── Badges ── */
+.badge {
+  display: inline-flex; align-items: center;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 9px; border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+.b-purple { background: var(--accent-l); color: var(--accent); }
+.b-green  { background: #E8F9EE; color: #219653; }
+.b-gray   { background: #F2F2F7; color: #8E8E93; }
+.b-orange { background: #FFF3E0; color: #C47D00; }
+.b-red    { background: #FFEBEA; color: var(--red); }
+.b-wa     { background: #E6F9EE; color: #128C7E; }
+
+/* ── Buttons ── */
+.btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  border: none; border-radius: 14px;
+  font-family: inherit; font-weight: 700; font-size: 15px;
+  cursor: pointer; width: 100%; padding: 15px;
+}
+.btn-accent  { background: var(--accent); color: white; }
+.btn-light   { background: var(--accent-l); color: var(--accent); }
+.btn-ghost   { background: var(--bg); color: var(--ink-2); font-size: 14px; }
+.btn-wa      { background: #25D366; color: white; }
+.btn-sm      { padding: 10px 16px; font-size: 13px; border-radius: 10px; width: auto; }
+.btn-row     { display: flex; gap: 8px; }
+
+/* ── Forms ── */
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 6px; }
+.field input, .field select, .field textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s;
+}
+.field input:focus, .field select:focus, .field textarea:focus {
+  border-color: var(--accent);
+  background: white;
+}
+.field select { appearance: none; }
+.field textarea { resize: none; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.form-body { padding: 20px; }
+
+/* ── Agenda slot ── */
+.slot {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.slot:last-child { border-bottom: none; }
+.slot-time { font-size: 13px; font-weight: 700; color: var(--ink-3); width: 42px; flex-shrink: 0; padding-top: 2px; }
+.slot-bar  { width: 3px; border-radius: 3px; background: var(--accent); flex-shrink: 0; align-self: stretch; min-height: 40px; }
+.slot-bar.green  { background: var(--green); }
+.slot-bar.orange { background: var(--orange); }
+.slot-name { font-size: 15px; font-weight: 700; color: var(--ink); }
+.slot-sub  { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+
+/* ── Timeline ── */
+.tl-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.tl-item:last-child { border-bottom: none; }
+.tl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+
+/* ── OCR upload zone ── */
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: 14px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  background: var(--bg);
+}
+.upload-zone:hover, .upload-zone.active { border-color: var(--accent); background: var(--accent-l); }
+.upload-zone svg { width: 32px; height: 32px; stroke: var(--ink-3); margin-bottom: 8px; }
+.upload-zone.active svg { stroke: var(--accent); }
+.upload-label { font-size: 13px; font-weight: 600; color: var(--ink-3); }
+.upload-sub { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.upload-zone.active .upload-label { color: var(--accent); }
+
+/* ── AI fill indicator ── */
+.ai-filled {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-l);
+  padding: 4px 10px; border-radius: 20px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+.ai-filled svg { width: 12px; height: 12px; stroke: var(--accent); fill: none; }
+
+/* ── Stat row ── */
+.stat { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.stat:last-child { border-bottom: none; }
+.stat-l { font-size: 14px; color: var(--ink-3); }
+.stat-r { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+/* ── Back btn ── */
+.back { background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 15px; font-weight: 600; color: var(--accent); padding: 0; font-family: inherit; }
+.back svg { width: 18px; height: 18px; stroke: var(--accent); fill: none; }
+
+/* ── WhatsApp origin badge ── */
+.wa-origin {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; color: #128C7E;
+  background: #E6F9EE; padding: 3px 9px; border-radius: 20px;
+}
+
+/* ── Toggle ── */
+.toggle-wrap { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.toggle-wrap:last-child { border-bottom: none; }
+.toggle-info h3 { font-size: 15px; font-weight: 600; color: var(--ink); }
+.toggle-info p  { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.toggle {
+  width: 48px; height: 28px; background: var(--border);
+  border-radius: 14px; position: relative; cursor: pointer; flex-shrink: 0;
+  transition: background .2s;
+}
+.toggle::after {
+  content: ''; position: absolute;
+  width: 22px; height: 22px; background: white; border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: left .2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+.toggle.on { background: var(--accent); }
+.toggle.on::after { left: 23px; }
+
+/* ── Search ── */
+.search-wrap { padding: 12px 16px 8px; }
+.search-input {
+  width: 100%; background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 11px 14px 11px 40px;
+  font-family: inherit; font-size: 15px; color: var(--ink);
+  outline: none; position: relative;
+}
+.search-box { position: relative; }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--ink-3); fill: none; }
+
+/* ── Filters ── */
+.filters { display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto; }
+.filters::-webkit-scrollbar { display: none; }
+.f-chip {
+  flex-shrink: 0; padding: 6px 14px;
+  border-radius: 20px; font-size: 12px; font-weight: 700;
+  cursor: pointer; border: 1.5px solid var(--border);
+  background: var(--card); color: var(--ink-3);
+  font-family: inherit;
+}
+.f-chip.on { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* ── Color swatch ── */
+.swatch { width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Segments bar ── */
+.seg-bar { display: flex; border-radius: 12px; overflow: hidden; height: 8px; margin: 12px 0; }
+
+/* ── Micro text ── */
+.micro { font-size: 11px; color: var(--ink-3); }
+
+/* ── Tip ── */
+.tip {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.75); color: rgba(255,255,255,0.9);
+  font-size: 12px; font-weight: 500;
+  padding: 8px 18px; border-radius: 20px; white-space: nowrap;
+  backdrop-filter: blur(8px);
+  font-family: 'DM Sans', sans-serif;
+  letter-spacing: 0.2px;
+}
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="status-bar">
+    <span>9:41</span>
+    <div class="status-icons">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="#1C1C1E"><rect x="0" y="4" width="3" height="8" rx="1"/><rect x="4" y="2.5" width="3" height="9.5" rx="1"/><rect x="8" y="1" width="3" height="11" rx="1"/><rect x="12" y="0" width="3" height="12" rx="1" opacity=".3"/></svg>
+      <svg width="15" height="12" viewBox="0 0 15 12" fill="none" stroke="#1C1C1E" stroke-width="1.5"><path d="M7.5 3C9.8 3 11.9 4 13.3 5.6M1.7 5.6C3.1 4 5.2 3 7.5 3"/><path d="M7.5 6.5C8.8 6.5 10 7 10.8 7.9M4.2 7.9C5 7 6.2 6.5 7.5 6.5"/><circle cx="7.5" cy="10.5" r="1.2" fill="#1C1C1E"/></svg>
+      <svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x="0.5" y="0.5" width="21" height="11" rx="3.5" stroke="#1C1C1E" stroke-opacity=".35"/><rect x="2" y="2" width="17" height="8" rx="2" fill="#1C1C1E"/><path d="M23 4v4a2 2 0 0 0 0-4z" fill="#1C1C1E" opacity=".4"/></svg>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ DASHBOARD ═══════════════════════════ -->
+  <div class="screen active" id="s-dash">
+    <div class="hero">
+      <div class="hero-greeting">Bom dia, Nina</div>
+      <div class="hero-title">Ótica Nina</div>
+      <div class="hero-sub">Terça-feira, 22 de abril de 2026</div>
+    </div>
+
+    <div class="scroll">
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-label">Faturamento</div>
+          <div class="kpi-num">12,8k</div>
+          <div class="kpi-delta">+18% vs março</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Vendas</div>
+          <div class="kpi-num">38</div>
+          <div class="kpi-delta">+5 vs março</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Ticket médio</div>
+          <div class="kpi-num">338</div>
+          <div class="kpi-delta">+5%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Novos clientes</div>
+          <div class="kpi-num">14</div>
+          <div class="kpi-delta" style="color:var(--ink-3)">este mês</div>
+        </div>
+      </div>
+
+      <!-- Base -->
+      <div class="section-h"><h2>Base de clientes</h2><a onclick="goTo('s-clients')">Ver todos</a></div>
+      <div class="card" style="padding:14px 16px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
+          <div style="text-align:center;">
+            <div style="font-size:28px;font-weight:800;color:var(--ink);">94</div>
+            <div class="micro">Recorrentes</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:28px;font-weight:800;color:var(--accent);">14</div>
+            <div class="micro">Novos</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="font-size:28px;font-weight:800;color:var(--orange);">23</div>
+            <div class="micro">Inativos</div>
+          </div>
+        </div>
+        <div class="seg-bar">
+          <div style="flex:94;background:var(--accent);"></div>
+          <div style="flex:14;background:#A78BFA;"></div>
+          <div style="flex:23;background:var(--orange);"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;" class="micro">
+          <span>Recorrentes 72%</span><span>Novos 11%</span><span>Inativos 17%</span>
+        </div>
+      </div>
+
+      <!-- Hoje -->
+      <div class="section-h"><h2>Hoje na agenda</h2><a onclick="goTo('s-agenda')">Ver agenda</a></div>
+      <div class="card-list" onclick="goTo('s-agenda')">
+        <div class="slot">
+          <div class="slot-time">09:30</div>
+          <div class="slot-bar"></div>
+          <div>
+            <div class="slot-name">Maria da Silva</div>
+            <div class="slot-sub">Consulta + armação · 30 min</div>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-time">14:00</div>
+          <div class="slot-bar green"></div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <div class="slot-name">João Pereira</div>
+              <div class="wa-origin">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="#128C7E"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+                via WhatsApp
+              </div>
+            </div>
+            <div class="slot-sub">Retirada de óculos · 30 min</div>
+          </div>
+        </div>
+        <div class="slot">
+          <div class="slot-time">16:30</div>
+          <div class="slot-bar orange"></div>
+          <div>
+            <div class="slot-name">Camila Rocha</div>
+            <div class="slot-sub">Ajuste de armação · 20 min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reativar -->
+      <div class="section-h"><h2>Reativar agora</h2><a onclick="goTo('s-clients')">Ver todos</a></div>
+      <div class="card-list">
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-orange">RL</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Regina Lima</div>
+            <div class="micro">R$ 2.100 · ausente há 14 meses</div>
+          </div>
+          <button class="btn btn-wa btn-sm" onclick="event.stopPropagation();goTo('s-wa')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+            Contatar
+          </button>
+        </div>
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-purple">FC</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Fernanda Costa</div>
+            <div class="micro">R$ 1.850 · ausente há 13 meses</div>
+          </div>
+          <button class="btn btn-wa btn-sm" onclick="event.stopPropagation();goTo('s-wa')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+            Contatar
+          </button>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn on" onclick="goTo('s-dash')">
+        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span style="color:var(--accent)">Início</span>
+      </button>
+      <button class="nav-btn" onclick="goTo('s-clients')">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Clientes</span>
+      </button>
+      <button class="nav-btn" onclick="goTo('s-agenda')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <span>Agenda</span>
+      </button>
+      <button class="nav-btn" onclick="goTo('s-sale')">
+        <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span>Venda</span>
+      </button>
+      <button class="nav-btn" onclick="goTo('s-settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        <span>Config</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ CLIENTES ═══════════════════════════ -->
+  <div class="screen" id="s-clients">
+    <div class="pg-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h1>Clientes</h1>
+        <button class="btn btn-accent btn-sm" onclick="goTo('s-new-client')" style="width:auto;">+ Novo</button>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" placeholder="Buscar por nome ou telefone">
+        </div>
+      </div>
+      <div class="filters">
+        <button class="f-chip on">Todos (131)</button>
+        <button class="f-chip">Recorrentes (94)</button>
+        <button class="f-chip">Novos (14)</button>
+        <button class="f-chip">Inativos (23)</button>
+      </div>
+      <div class="card-list">
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-purple">AP</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Ana Paula Mendes</div>
+            <div class="micro">(11) 98765-4321 · 5 compras</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="badge b-green">Recorrente</div>
+            <div style="font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;">R$ 3.420</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-green">MS</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Maria da Silva</div>
+            <div class="micro">(11) 97654-3210 · 2 compras</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="badge b-green">Recorrente</div>
+            <div style="font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;">R$ 1.280</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-gray">JR</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">João Rocha</div>
+            <div class="micro">(11) 96543-2109 · 1 compra</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="badge b-gray">Novo</div>
+            <div style="font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;">R$ 650</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-orange">RL</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Regina Lima</div>
+            <div class="micro">(11) 95432-1098 · 3 compras</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="badge b-orange">Inativa</div>
+            <div style="font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;">R$ 2.100</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-detail')">
+          <div class="av av-purple">CS</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Carla Santos</div>
+            <div class="micro">(11) 94321-0987 · 4 compras</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="badge b-green">Recorrente</div>
+            <div style="font-size:15px;font-weight:800;color:var(--ink);margin-top:4px;">R$ 2.900</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn on" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span style="color:var(--accent)">Clientes</span></button>
+      <button class="nav-btn" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Agenda</span></button>
+      <button class="nav-btn" onclick="goTo('s-sales-list')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Vendas</span></button>
+      <button class="nav-btn" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Config</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ DETALHE CLIENTE ═══════════════════════════ -->
+  <div class="screen" id="s-detail">
+    <div class="pg-header">
+      <button class="back" onclick="goTo('s-clients')">
+        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Clientes
+      </button>
+    </div>
+    <div class="scroll">
+      <!-- Hero cliente -->
+      <div style="padding:20px;background:var(--card);margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+          <div class="av av-purple" style="width:56px;height:56px;font-size:20px;">AP</div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:var(--ink);letter-spacing:-0.4px;">Ana Paula Mendes</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+              <div class="badge b-green">Recorrente</div>
+            </div>
+          </div>
+        </div>
+        <!-- Resumo financeiro -->
+        <div style="display:flex;background:var(--bg);border-radius:14px;padding:14px;gap:0;">
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-1px;">3.420</div>
+            <div class="micro">Total gasto</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-1px;">5</div>
+            <div class="micro">Compras</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div style="flex:1;text-align:center;">
+            <div style="font-size:24px;font-weight:800;color:var(--ink);letter-spacing:-1px;">684</div>
+            <div class="micro">Ticket médio</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info + ações -->
+      <div class="card">
+        <div class="stat"><span class="stat-l">Telefone</span><span class="stat-r">(11) 98765-4321</span></div>
+        <div class="stat"><span class="stat-l">Aniversário</span><span class="stat-r">12 de junho</span></div>
+        <div class="stat"><span class="stat-l">CPF</span><span class="stat-r">123.456.789-00</span></div>
+        <div class="stat" style="border:none;"><span class="stat-l">Última compra</span><span class="stat-r">15 abr 2026</span></div>
+      </div>
+      <div style="padding:0 16px 10px;display:flex;gap:8px;">
+        <button class="btn btn-wa" onclick="goTo('s-wa')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+          WhatsApp
+        </button>
+        <button class="btn btn-light" onclick="goTo('s-sale')">Nova venda</button>
+      </div>
+
+      <!-- Timeline -->
+      <div class="section-h"><h2>Histórico</h2></div>
+      <div class="card">
+        <div class="tl-item" onclick="goTo('s-sale-detail')">
+          <div class="tl-dot" style="background:var(--accent);"></div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:14px;font-weight:700;">Venda</span>
+              <span style="font-size:15px;font-weight:800;color:var(--accent);">R$ 890</span>
+            </div>
+            <div class="micro" style="margin-top:2px;">15 abr 2026 · PIX · OD -2,50 / OE -3,00</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:#25D366;"></div>
+          <div style="flex:1;">
+            <div style="font-size:14px;font-weight:700;">Mensagem enviada</div>
+            <div class="micro" style="margin-top:2px;">12 jun 2025 · Aniversário + cupom 10%</div>
+            <div class="badge b-green" style="margin-top:4px;">Lida</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-dot" style="background:var(--accent);"></div>
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;">
+              <span style="font-size:14px;font-weight:700;">Venda</span>
+              <span style="font-size:15px;font-weight:800;color:var(--accent);">R$ 750</span>
+            </div>
+            <div class="micro" style="margin-top:2px;">03 mar 2025 · Crédito 3x</div>
+          </div>
+        </div>
+        <div class="tl-item" style="border:none;">
+          <div class="tl-dot" style="background:var(--ink-3);"></div>
+          <div>
+            <div style="font-size:14px;font-weight:700;">Agendamento</div>
+            <div class="micro" style="margin-top:2px;">03 mar 2025 · 10:00 · Concluído</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn on" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span style="color:var(--accent)">Clientes</span></button>
+      <button class="nav-btn" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Agenda</span></button>
+      <button class="nav-btn" onclick="goTo('s-sales-list')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Vendas</span></button>
+      <button class="nav-btn" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Config</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ NOVO CLIENTE ═══════════════════════════ -->
+  <div class="screen" id="s-new-client">
+    <div class="pg-header">
+      <button class="back" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Clientes</button>
+      <h1 style="margin-top:8px;">Novo cliente</h1>
+    </div>
+    <div class="scroll">
+      <div class="form-body">
+        <div class="field"><label>Nome completo</label><input placeholder="Ana Paula Mendes"></div>
+        <div class="field"><label>Telefone / WhatsApp</label><input placeholder="(11) 9 0000-0000" type="tel"></div>
+        <div class="grid-2">
+          <div class="field"><label>CPF</label><input placeholder="000.000.000-00"></div>
+          <div class="field"><label>Nascimento</label><input type="date"></div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Sexo</label>
+            <select>
+              <option value="">Selecionar</option>
+              <option>Feminino</option>
+              <option>Masculino</option>
+              <option>Outro</option>
+              <option>Prefiro não informar</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>E-mail</label>
+            <input placeholder="email@exemplo.com" type="email">
+          </div>
+        </div>
+
+        <!-- Segmento -->
+        <div class="field">
+          <label>Status do cliente</label>
+          <select id="nc-segmento" onchange="togglePrimeiroAtendimento(this.value)">
+            <option value="novo">Novo — primeira vez</option>
+            <option value="recorrente">Recorrente — já comprou antes</option>
+            <option value="inativo">Inativo — sumiu há um tempo</option>
+          </select>
+        </div>
+
+        <!-- Campo condicional: aparece quando NÃO é novo -->
+        <div id="nc-historico" style="display:none;background:var(--accent-l);border-radius:14px;padding:14px;margin-bottom:12px;">
+          <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:10px;">Como ele já é cliente, informe o histórico</div>
+          <div class="grid-2">
+            <div class="field" style="margin-bottom:0;">
+              <label>Primeiro atendimento</label>
+              <input type="date" placeholder="Data aprox.">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Nº de compras anteriores</label>
+              <input type="number" placeholder="Ex: 3" min="1">
+            </div>
+          </div>
+          <div class="field" style="margin-top:10px;margin-bottom:0;">
+            <label>Total gasto aproximado (R$)</label>
+            <input type="number" placeholder="Ex: 1200">
+          </div>
+        </div>
+
+        <div class="field"><label>Observações</label><textarea rows="3" placeholder="Preferências, informações relevantes…"></textarea></div>
+        <button class="btn btn-accent" onclick="goTo('s-detail')">Salvar cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ AGENDA ═══════════════════════════ -->
+  <div class="screen" id="s-agenda">
+    <div class="pg-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h1>Agenda</h1>
+        <button class="btn btn-accent btn-sm" onclick="goTo('s-new-appt')" style="width:auto;">+ Novo</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:12px;">
+        <button class="f-chip on" style="flex:1;text-align:center;">Dia</button>
+        <button class="f-chip" style="flex:1;text-align:center;">Semana</button>
+        <button class="f-chip" style="flex:1;text-align:center;">Mês</button>
+      </div>
+    </div>
+    <div class="scroll">
+      <!-- Mini cal -->
+      <div style="background:var(--card);padding:12px 16px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+          <span style="font-size:15px;font-weight:700;">Abril 2026</span>
+          <div style="display:flex;gap:4px;">
+            <button style="background:var(--bg);border:none;width:30px;height:30px;border-radius:8px;font-size:16px;cursor:pointer;">‹</button>
+            <button style="background:var(--bg);border:none;width:30px;height:30px;border-radius:8px;font-size:16px;cursor:pointer;">›</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center;">
+          <div class="micro" style="padding:4px;">D</div><div class="micro" style="padding:4px;">S</div><div class="micro" style="padding:4px;">T</div><div class="micro" style="padding:4px;">Q</div><div class="micro" style="padding:4px;">Q</div><div class="micro" style="padding:4px;">S</div><div class="micro" style="padding:4px;">S</div>
+          <div style="padding:6px;font-size:14px;color:var(--ink-3);">30</div><div style="padding:6px;font-size:14px;color:var(--ink-3);">31</div><div style="padding:6px;font-size:14px;">1</div><div style="padding:6px;font-size:14px;">2</div><div style="padding:6px;font-size:14px;">3</div><div style="padding:6px;font-size:14px;">4</div><div style="padding:6px;font-size:14px;">5</div>
+          <div style="padding:6px;font-size:14px;">6</div><div style="padding:6px;font-size:14px;">7</div><div style="padding:6px;font-size:14px;">8</div><div style="padding:6px;font-size:14px;position:relative;">9<span style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%;display:block;"></span></div><div style="padding:6px;font-size:14px;">10</div><div style="padding:6px;font-size:14px;">11</div><div style="padding:6px;font-size:14px;">12</div>
+          <div style="padding:6px;font-size:14px;">13</div><div style="padding:6px;font-size:14px;">14</div><div style="padding:6px;font-size:14px;position:relative;">15<span style="position:absolute;bottom:1px;left:50%;transform:translateX(-50%);width:4px;height:4px;background:var(--accent);border-radius:50%;display:block;"></span></div><div style="padding:6px;font-size:14px;">16</div><div style="padding:6px;font-size:14px;">17</div><div style="padding:6px;font-size:14px;">18</div><div style="padding:6px;font-size:14px;">19</div>
+          <div style="padding:6px;font-size:14px;">20</div><div style="padding:6px;font-size:14px;">21</div><div style="padding:4px;"><div style="background:var(--accent);color:white;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;margin:0 auto;">22</div></div><div style="padding:6px;font-size:14px;">23</div><div style="padding:6px;font-size:14px;">24</div><div style="padding:6px;font-size:14px;">25</div><div style="padding:6px;font-size:14px;">26</div>
+        </div>
+      </div>
+
+      <div style="padding:16px 20px 8px;font-size:13px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.6px;">Terça-feira, 22 de abril</div>
+      <div class="card-list">
+        <div class="slot" onclick="goTo('s-detail')">
+          <div class="slot-time">09:30</div>
+          <div class="slot-bar"></div>
+          <div style="flex:1;">
+            <div class="slot-name">Maria da Silva</div>
+            <div class="slot-sub">Consulta + armação · 30 min</div>
+          </div>
+          <div class="badge b-purple">Agendado</div>
+        </div>
+        <div class="slot" onclick="goTo('s-detail')">
+          <div class="slot-time">14:00</div>
+          <div class="slot-bar green"></div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <div class="slot-name">João Pereira</div>
+              <div class="wa-origin">via WhatsApp</div>
+            </div>
+            <div class="slot-sub">Retirada de óculos · 30 min</div>
+          </div>
+          <div class="badge b-green">Concluído</div>
+        </div>
+        <div class="slot" onclick="goTo('s-detail')">
+          <div class="slot-time">16:30</div>
+          <div class="slot-bar orange"></div>
+          <div style="flex:1;">
+            <div class="slot-name">Camila Rocha</div>
+            <div class="slot-sub">Ajuste de armação · 20 min</div>
+          </div>
+          <div class="badge b-orange">Pendente</div>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clientes</span></button>
+      <button class="nav-btn on" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span style="color:var(--accent)">Agenda</span></button>
+      <button class="nav-btn" onclick="goTo('s-sales-list')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Vendas</span></button>
+      <button class="nav-btn" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Config</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ NOVO AGENDAMENTO ═══════════════════════════ -->
+  <div class="screen" id="s-new-appt">
+    <div class="pg-header">
+      <button class="back" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Agenda</button>
+      <h1 style="margin-top:8px;">Novo agendamento</h1>
+    </div>
+    <div class="scroll">
+      <div class="form-body">
+        <div class="field">
+          <label>Cliente</label>
+          <input id="appt-client-input" placeholder="Buscar cliente…" oninput="handleApptSearch(this.value)">
+          <!-- Sugestão inline de criar cliente -->
+          <div id="appt-no-client" style="display:none;background:var(--accent-l);border-radius:10px;padding:12px 14px;margin-top:8px;cursor:pointer;" onclick="goTo('s-new-client')">
+            <div style="font-size:13px;font-weight:700;color:var(--accent);">Cliente não encontrado</div>
+            <div style="font-size:12px;color:var(--ink-3);margin-top:2px;">Toque para cadastrar "<span id="appt-client-name"></span>" agora</div>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field"><label>Data</label><input type="date" value="2026-04-22"></div>
+          <div class="field"><label>Horário</label><input type="time" value="09:30"></div>
+        </div>
+        <div class="field">
+          <label>Duração</label>
+          <select><option>20 minutos</option><option selected>30 minutos</option><option>45 minutos</option><option>1 hora</option></select>
+        </div>
+        <div class="field"><label>Observações</label><textarea rows="3" placeholder="Motivo do atendimento…"></textarea></div>
+        <button class="btn btn-accent" onclick="goTo('s-agenda')">Salvar agendamento</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ HISTÓRICO DE VENDAS ═══════════════════════════ -->
+  <div class="screen" id="s-sales-list">
+    <div class="pg-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <h1>Vendas</h1>
+        <button class="btn btn-accent btn-sm" onclick="goTo('s-sale')" style="width:auto;">+ Nova</button>
+      </div>
+    </div>
+    <div class="scroll">
+      <div class="search-wrap">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" placeholder="Buscar por cliente…">
+        </div>
+      </div>
+
+      <!-- Filtros por período -->
+      <div class="filters">
+        <button class="f-chip on">Tudo</button>
+        <button class="f-chip">Este mês</button>
+        <button class="f-chip">Mês passado</button>
+        <button class="f-chip">Este ano</button>
+      </div>
+
+      <!-- Resumo do período -->
+      <div class="card" style="padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-around;text-align:center;">
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--accent);letter-spacing:-1px;">R$ 38,4k</div>
+            <div class="micro">Total 2026</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px;">114</div>
+            <div class="micro">Vendas</div>
+          </div>
+          <div style="width:1px;background:var(--border);"></div>
+          <div>
+            <div style="font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-1px;">R$ 337</div>
+            <div class="micro">Ticket médio</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Abril -->
+      <div style="padding:4px 20px 8px;font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.7px;">Abril 2026</div>
+      <div class="card-list">
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-purple">AP</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Ana Paula Mendes</div>
+            <div class="micro">15 abr · PIX · OD -2,50 / OE -3,00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 890</div>
+            <div class="micro" style="margin-top:2px;">à vista</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-green">MS</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Maria da Silva</div>
+            <div class="micro">12 abr · Crédito 3x</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 1.200</div>
+            <div class="micro" style="margin-top:2px;">3x R$ 400</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-gray">JR</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">João Rocha</div>
+            <div class="micro">10 abr · Débito</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 650</div>
+            <div class="micro" style="margin-top:2px;">à vista</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-purple">CS</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Carla Santos</div>
+            <div class="micro">07 abr · PIX · OD -1,75 / OE -2,00</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 780</div>
+            <div class="micro" style="margin-top:2px;">à vista</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-orange">TC</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Tatiane Costa</div>
+            <div class="micro">03 abr · Crédito 6x</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 480</div>
+            <div class="micro" style="margin-top:2px;">6x R$ 80</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Março -->
+      <div style="padding:14px 20px 8px;font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.7px;">Março 2026</div>
+      <div class="card-list">
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-purple">AP</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Ana Paula Mendes</div>
+            <div class="micro">28 mar · Crédito 3x</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 750</div>
+            <div class="micro" style="margin-top:2px;">3x R$ 250</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-green">MS</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Maria da Silva</div>
+            <div class="micro">15 mar · PIX</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 920</div>
+            <div class="micro" style="margin-top:2px;">à vista</div>
+          </div>
+        </div>
+        <div class="row" onclick="goTo('s-sale-detail')">
+          <div class="av av-gray">FC</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:700;color:var(--ink);">Fernanda Costa</div>
+            <div class="micro">02 mar · Dinheiro</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:16px;font-weight:800;color:var(--accent);">R$ 430</div>
+            <div class="micro" style="margin-top:2px;">à vista</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clientes</span></button>
+      <button class="nav-btn" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Agenda</span></button>
+      <button class="nav-btn on" onclick="goTo('s-sales-list')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span style="color:var(--accent)">Vendas</span></button>
+      <button class="nav-btn" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Config</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ NOVA VENDA ═══════════════════════════ -->
+  <div class="screen" id="s-sale">
+    <div class="pg-header">
+      <h1>Registrar venda</h1>
+      <p>Preencha os dados ou anexe os documentos</p>
+    </div>
+    <div class="scroll">
+      <div class="form-body">
+        <div class="field"><label>Cliente</label><input value="Ana Paula Mendes"></div>
+        <div class="field"><label>Valor total</label><input id="sale-valor" placeholder="R$ 0,00" type="number"></div>
+        <div class="grid-2">
+          <div class="field"><label>Pagamento</label><select><option>PIX</option><option>Dinheiro</option><option>Crédito</option><option>Débito</option><option>Boleto</option></select></div>
+          <div class="field"><label>Parcelas</label><select><option>1x</option><option>2x</option><option>3x</option><option>4x</option><option>6x</option><option>12x</option></select></div>
+        </div>
+
+        <!-- Grau -->
+        <div style="background:var(--accent-l);border-radius:14px;padding:14px;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:13px;font-weight:700;color:var(--accent);">Grau do cliente</div>
+            <div id="ai-badge-grau" class="ai-filled" style="display:none;">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              Preenchido pela IA
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="field" style="margin-bottom:0;"><label>OD (direito)</label><input id="grau-od" placeholder="-2,50"></div>
+            <div class="field" style="margin-bottom:0;"><label>OE (esquerdo)</label><input id="grau-oe" placeholder="-3,00"></div>
+          </div>
+        </div>
+
+        <!-- Upload docs -->
+        <div style="font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;">Documentos</div>
+
+        <!-- OS -->
+        <div id="os-zone" class="upload-zone" style="margin-bottom:10px;" onclick="simulateOCR_OS()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <div class="upload-label">Ordem de Serviço</div>
+          <div class="upload-sub">Toque para fotografar · IA lê o grau automaticamente</div>
+        </div>
+        <div id="os-done" style="display:none;background:#E8F9EE;border-radius:14px;padding:12px 14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#219653;">OS lida com sucesso</div>
+          <div class="micro" style="margin-top:3px;">Grau extraído e preenchido automaticamente</div>
+        </div>
+
+        <!-- NF -->
+        <div id="nf-zone" class="upload-zone" style="margin-bottom:14px;" onclick="simulateOCR_NF()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <div class="upload-label">Nota Fiscal</div>
+          <div class="upload-sub">Toque para fotografar · IA extrai o valor total</div>
+        </div>
+        <div id="nf-done" style="display:none;background:#E8F9EE;border-radius:14px;padding:12px 14px;margin-bottom:14px;">
+          <div style="font-size:13px;font-weight:700;color:#219653;">NF lida com sucesso</div>
+          <div class="micro" style="margin-top:3px;">Valor R$ 890,00 extraído · você pode editar acima</div>
+        </div>
+
+        <!-- Óculos foto -->
+        <div class="upload-zone" style="margin-bottom:14px;">
+          <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <div class="upload-label">Foto do óculos</div>
+          <div class="upload-sub">Para registro do produto vendido</div>
+        </div>
+
+        <div class="field"><label>Observações</label><textarea rows="2" placeholder="Armação, lente, cor, informações relevantes…"></textarea></div>
+        <button class="btn btn-accent" onclick="goTo('s-sale-detail')">Salvar venda</button>
+      </div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clientes</span></button>
+      <button class="nav-btn" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Agenda</span></button>
+      <button class="nav-btn on" onclick="goTo('s-sale')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span style="color:var(--accent)">Venda</span></button>
+      <button class="nav-btn" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Config</span></button>
+    </nav>
+  </div>
+
+  <!-- ═══════════════════════════ DETALHE VENDA ═══════════════════════════ -->
+  <div class="screen" id="s-sale-detail">
+    <div class="pg-header">
+      <button class="back" onclick="goTo('s-detail')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Ana Paula</button>
+    </div>
+    <div class="scroll">
+      <div style="background:var(--accent);padding:24px 22px;color:white;text-align:center;">
+        <div style="font-size:13px;font-weight:500;opacity:.8;margin-bottom:4px;">Venda #1047 · 15 abr 2026</div>
+        <div style="font-size:40px;font-weight:800;letter-spacing:-2px;">R$ 890</div>
+        <div style="font-size:14px;opacity:.8;margin-top:4px;">PIX · à vista · Ana Paula Mendes</div>
+      </div>
+      <div class="card" style="margin-top:10px;">
+        <div class="stat"><span class="stat-l">OD (direito)</span><span class="stat-r">-2,50 cil -0,75 eixo 180°</span></div>
+        <div class="stat" style="border:none;"><span class="stat-l">OE (esquerdo)</span><span class="stat-r">-3,00 cil -1,00 eixo 175°</span></div>
+      </div>
+      <div class="section-h"><h2>Documentos</h2></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:0 16px 16px;">
+        <div style="background:var(--card);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span class="micro">Óculos</span>
+        </div>
+        <div style="background:var(--card);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          <span class="micro">Nota Fiscal</span>
+        </div>
+        <div style="background:var(--card);border-radius:12px;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--ink-3)" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          <span class="micro">Ordem Serv.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ WHATSAPP ═══════════════════════════ -->
+  <div class="screen" id="s-wa">
+    <div class="pg-header">
+      <button class="back" onclick="goTo('s-detail')"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Ana Paula</button>
+      <h1 style="margin-top:8px;">Enviar mensagem</h1>
+    </div>
+    <div class="scroll">
+      <div style="padding:16px;">
+        <div style="font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;">Templates aprovados</div>
+
+        <div style="border:2px solid var(--accent);border-radius:14px;padding:14px;margin-bottom:10px;background:var(--accent-l);cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:14px;font-weight:800;color:var(--accent);">Aniversário + Cupom</div>
+            <div class="badge b-purple">Marketing</div>
+          </div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.5;">Olá <strong>Ana Paula</strong>! Parabéns pelo seu aniversário! A Ótica Nina tem um presente especial: <strong>10% OFF</strong> na sua próxima compra. Use o cupom: ANIVERSARIO10</div>
+        </div>
+
+        <div style="border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;background:var(--card);cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:14px;font-weight:800;color:var(--ink);">Lembrete de retorno</div>
+            <div class="badge b-orange">Marketing</div>
+          </div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.5;">Oi <strong>Ana Paula</strong>! Faz um tempinho que não te vemos na Ótica Nina. Que tal agendar uma consulta? Temos novidades esperando por você!</div>
+        </div>
+
+        <div style="border:1.5px solid var(--border);border-radius:14px;padding:14px;margin-bottom:16px;background:var(--card);cursor:pointer;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <div style="font-size:14px;font-weight:800;color:var(--ink);">Óculos pronto</div>
+            <div class="badge b-purple">Utility</div>
+          </div>
+          <div style="font-size:13px;color:var(--ink-2);line-height:1.5;">Olá <strong>Ana Paula</strong>! Seu óculos já está pronto para retirada. Nosso horário: Seg–Sex 9h–18h, Sáb 9h–13h.</div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.7px;margin-bottom:8px;">Mensagem livre</div>
+        <div class="field"><textarea rows="4" placeholder="Digite uma mensagem personalizada…"></textarea></div>
+        <button class="btn btn-wa" onclick="goTo('s-detail')">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"/></svg>
+          Enviar pelo WhatsApp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════ CONFIGURAÇÕES ═══════════════════════════ -->
+  <div class="screen" id="s-settings">
+    <div class="pg-header"><h1>Configurações</h1></div>
+    <div class="scroll">
+      <div class="section-h"><h2>Identidade visual</h2></div>
+      <div class="card">
+        <div class="stat"><span class="stat-l">Nome da ótica</span><span class="stat-r" style="color:var(--accent);font-weight:800;">Ótica Nina</span></div>
+        <div class="stat">
+          <span class="stat-l">Cor primária</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="swatch" style="background:var(--accent);"></div>
+            <span class="stat-r">#6C37C9</span>
+          </div>
+        </div>
+        <div class="stat" style="border:none;">
+          <span class="stat-l">Logo</span>
+          <button class="btn btn-light btn-sm">Trocar logo</button>
+        </div>
+      </div>
+
+      <div class="section-h"><h2>WhatsApp · Meta Cloud API</h2></div>
+      <div class="card">
+        <div class="stat"><span class="stat-l">Status</span><div class="badge b-green">Conectado</div></div>
+        <div class="stat"><span class="stat-l">Número</span><span class="stat-r">+55 11 9000-0000</span></div>
+        <div class="stat" style="border:none;"><span class="stat-l">Horário de disparo</span><span class="stat-r">09:00</span></div>
+      </div>
+
+<div class="section-h"><h2>Automações</h2></div>
+      <div class="card">
+        <div class="toggle-wrap">
+          <div class="toggle-info"><h3>Aniversário + cupom</h3><p>Disparado no dia do aniversário</p></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="toggle-wrap">
+          <div class="toggle-info"><h3>Reativação (1 ano)</h3><p>Clientes sem comprar há 12 meses</p></div>
+          <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+
+      <div class="section-h"><h2>Cupom de aniversário</h2></div>
+      <div class="card">
+        <div class="grid-2">
+          <div class="field"><label>Desconto</label><input value="10"></div>
+          <div class="field"><label>Tipo</label><select><option selected>% Percentual</option><option>R$ Fixo</option></select></div>
+        </div>
+      </div>
+      <div style="height:24px;"></div>
+    </div>
+    <nav class="nav">
+      <button class="nav-btn" onclick="goTo('s-dash')"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Início</span></button>
+      <button class="nav-btn" onclick="goTo('s-clients')"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Clientes</span></button>
+      <button class="nav-btn" onclick="goTo('s-agenda')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Agenda</span></button>
+      <button class="nav-btn" onclick="goTo('s-sales-list')"><svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Vendas</span></button>
+      <button class="nav-btn on" onclick="goTo('s-settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span style="color:var(--accent)">Config</span></button>
+    </nav>
+  </div>
+
+</div><!-- /phone -->
+
+<div class="tip">Clique nos itens para navegar · Toque nos uploads para ver o OCR em ação</div>
+
+<script>
+function togglePrimeiroAtendimento(val) {
+  document.getElementById('nc-historico').style.display = val === 'novo' ? 'none' : 'block'
+}
+
+function goTo(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+  const t = document.getElementById(id)
+  if (t) { t.classList.add('active'); t.querySelector('.scroll')?.scrollTo(0,0) }
+}
+
+// Simula OCR na Ordem de Serviço
+function simulateOCR_OS() {
+  const zone = document.getElementById('os-zone')
+  const done = document.getElementById('os-done')
+  const badge = document.getElementById('ai-badge-grau')
+  zone.classList.add('active')
+  zone.innerHTML = '<svg viewBox="0 0 24 24" width="32" height="32" stroke="var(--accent)" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><div class="upload-label" style="color:var(--accent)">Lendo OS com IA…</div>'
+  setTimeout(() => {
+    zone.style.display = 'none'
+    done.style.display = 'block'
+    badge.style.display = 'flex'
+    document.getElementById('grau-od').value = '-2,50 cil -0,75 eixo 180°'
+    document.getElementById('grau-oe').value = '-3,00 cil -1,00 eixo 175°'
+  }, 1800)
+}
+
+// Simula OCR na Nota Fiscal
+function simulateOCR_NF() {
+  const zone = document.getElementById('nf-zone')
+  const done = document.getElementById('nf-done')
+  zone.classList.add('active')
+  zone.innerHTML = '<svg viewBox="0 0 24 24" width="32" height="32" stroke="var(--accent)" fill="none"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><div class="upload-label" style="color:var(--accent)">Lendo NF com IA…</div>'
+  setTimeout(() => {
+    zone.style.display = 'none'
+    done.style.display = 'block'
+    document.getElementById('sale-valor').value = '890'
+  }, 1600)
+}
+
+// Agenda: sugestão de criar cliente
+let apptTimer
+function handleApptSearch(val) {
+  clearTimeout(apptTimer)
+  const hint = document.getElementById('appt-no-client')
+  const name = document.getElementById('appt-client-name')
+  if (val.length > 2) {
+    apptTimer = setTimeout(() => {
+      hint.style.display = 'block'
+      name.textContent = val
+    }, 600)
+  } else {
+    hint.style.display = 'none'
+  }
+}
+</script>
+</body>
+</html>

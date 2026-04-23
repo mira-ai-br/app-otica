@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #0C5FA8;
+  --color-primary-light: #E0EEF8;
+  --color-secondary: #094A84;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { font-family: 'Inter', system-ui, sans-serif; }
+
+/* Safe area para iPhone */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }

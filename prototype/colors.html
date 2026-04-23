@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ótica Nina — Comparativo de Cores</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #0D0D0D;
+  min-height: 100vh;
+  padding: 40px 24px 60px;
+}
+
+h1 {
+  color: white;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 6px;
+  letter-spacing: -0.5px;
+}
+.subtitle {
+  color: rgba(255,255,255,0.45);
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.grid {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.col { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.col-label {
+  color: white;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+}
+.col-hex {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 20px;
+  color: white;
+}
+
+/* Phone */
+.phone {
+  width: 260px;
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.7), inset 0 0 0 1.5px rgba(255,255,255,0.07);
+  background: #F2F2F7;
+}
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 18px 4px;
+  background: white;
+  font-size: 10px;
+  font-weight: 700;
+  color: #1C1C1E;
+}
+
+/* Hero */
+.hero {
+  padding: 16px 16px 22px;
+  color: white;
+}
+.hero-greeting { font-size: 11px; opacity: 0.8; margin-bottom: 2px; }
+.hero-title { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+.hero-sub { font-size: 11px; opacity: 0.7; margin-top: 2px; }
+
+/* KPIs */
+.kpi-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 0 12px; margin-top: -12px; }
+.kpi {
+  background: white;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+}
+.kpi-l { font-size: 9px; font-weight: 700; color: #8E8E93; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-n { font-size: 20px; font-weight: 800; color: #1C1C1E; letter-spacing: -0.8px; margin-top: 3px; }
+.kpi-d { font-size: 10px; font-weight: 600; margin-top: 2px; }
+
+/* Section */
+.sec-h {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 14px 14px 8px;
+}
+.sec-title { font-size: 12px; font-weight: 700; color: #1C1C1E; }
+
+/* Card list */
+.card-list { background: white; border-radius: 12px; margin: 0 12px 10px; overflow: hidden; }
+.row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid #F2F2F7;
+}
+.row:last-child { border-bottom: none; }
+.av {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 11px; flex-shrink: 0;
+}
+.row-info { flex: 1; }
+.row-name { font-size: 12px; font-weight: 700; color: #1C1C1E; }
+.row-sub  { font-size: 10px; color: #8E8E93; margin-top: 1px; }
+
+/* Badge */
+.badge {
+  font-size: 9px; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px;
+}
+
+/* Slot */
+.slot {
+  display: flex; gap: 8px; align-items: flex-start;
+  padding: 10px 12px; border-bottom: 1px solid #F2F2F7;
+}
+.slot:last-child { border-bottom: none; }
+.slot-time { font-size: 10px; font-weight: 700; color: #8E8E93; width: 32px; flex-shrink: 0; padding-top: 2px; }
+.slot-bar { width: 3px; border-radius: 3px; flex-shrink: 0; align-self: stretch; min-height: 30px; }
+.slot-name { font-size: 12px; font-weight: 700; color: #1C1C1E; }
+.slot-sub  { font-size: 10px; color: #8E8E93; margin-top: 1px; }
+
+/* Bottom nav */
+.nav {
+  background: white; border-top: 1px solid #E5E5EA;
+  display: flex; padding: 8px 0 14px;
+}
+.nav-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 2px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+}
+.nav-btn svg { width: 18px; height: 18px; stroke-width: 1.8; fill: none; }
+.nav-btn span { font-size: 8px; font-weight: 700; }
+
+/* Pick button */
+.pick-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  letter-spacing: 0.2px;
+}
+
+.chosen-banner {
+  display: none;
+  background: white;
+  color: #1C1C1E;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  padding: 12px;
+  border-radius: 12px;
+  margin-top: 4px;
+}
+</style>
+</head>
+<body>
+
+<h1>Qual cor você prefere?</h1>
+<p class="subtitle">Clique em "Escolher" para confirmar sua preferência</p>
+
+<div class="grid">
+
+  <!-- ══════ OPÇÃO A — Safira #0C5FA8 ══════ -->
+  <div class="col">
+    <div class="col-label">A — Azul Safira</div>
+    <div class="col-hex" style="background:#0C5FA8;">#0C5FA8</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;">Sóbrio · Médico · Institucional</div>
+
+    <div class="phone">
+      <div class="status">
+        <span>9:41</span>
+        <span>●●● ▲ ▮▮▮</span>
+      </div>
+      <div class="hero" style="background:#0C5FA8;">
+        <div class="hero-greeting">Bom dia, Nina</div>
+        <div class="hero-title">Ótica Nina</div>
+        <div class="hero-sub">Terça, 22 de abril de 2026</div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-l">Faturamento</div>
+          <div class="kpi-n">12,8k</div>
+          <div class="kpi-d" style="color:#0C5FA8;">+18%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Vendas</div>
+          <div class="kpi-n">38</div>
+          <div class="kpi-d" style="color:#34C759;">+5</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Ticket médio</div>
+          <div class="kpi-n">338</div>
+          <div class="kpi-d" style="color:#34C759;">+5%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Novos clientes</div>
+          <div class="kpi-n">14</div>
+          <div class="kpi-d" style="color:#8E8E93;">este mês</div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Hoje na agenda</span>
+        <span style="font-size:10px;font-weight:700;color:#0C5FA8;cursor:pointer;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="slot">
+          <div class="slot-time">09:30</div>
+          <div class="slot-bar" style="background:#0C5FA8;"></div>
+          <div><div class="slot-name">Maria da Silva</div><div class="slot-sub">Consulta + armação</div></div>
+        </div>
+        <div class="slot">
+          <div class="slot-time">14:00</div>
+          <div class="slot-bar" style="background:#34C759;"></div>
+          <div><div class="slot-name">João Pereira</div><div class="slot-sub">via WhatsApp · Retirada</div></div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Clientes</span>
+        <span style="font-size:10px;font-weight:700;color:#0C5FA8;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="row">
+          <div class="av" style="background:#E0EEF8;color:#0C5FA8;">AP</div>
+          <div class="row-info">
+            <div class="row-name">Ana Paula Mendes</div>
+            <div class="row-sub">5 compras · R$ 3.420</div>
+          </div>
+          <div class="badge" style="background:#E0EEF8;color:#0C5FA8;">Recorrente</div>
+        </div>
+        <div class="row">
+          <div class="av" style="background:#E8F9EE;color:#219653;">RL</div>
+          <div class="row-info">
+            <div class="row-name">Regina Lima</div>
+            <div class="row-sub">3 compras · R$ 2.100</div>
+          </div>
+          <div class="badge" style="background:#FFF3E0;color:#C47D00;">Inativa</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#0C5FA8"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span style="color:#0C5FA8;">Início</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span style="color:#8E8E93;">Clientes</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span style="color:#8E8E93;">Agenda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span style="color:#8E8E93;">Venda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0"/></svg><span style="color:#8E8E93;">Config</span></button>
+      </div>
+    </div>
+    <button class="pick-btn" style="background:#0C5FA8;" onclick="pick('A','#0C5FA8','Azul Safira')">Escolher opção A</button>
+    <div id="chosen-A" class="chosen-banner">Você escolheu o Azul Safira!</div>
+  </div>
+
+  <!-- ══════ OPÇÃO B — Oceano #0284C7 ══════ -->
+  <div class="col">
+    <div class="col-label">B — Azul Oceano</div>
+    <div class="col-hex" style="background:#0284C7;">#0284C7</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;">Moderno · Tecnológico · Jovem</div>
+
+    <div class="phone">
+      <div class="status">
+        <span>9:41</span>
+        <span>●●● ▲ ▮▮▮</span>
+      </div>
+      <div class="hero" style="background:#0284C7;">
+        <div class="hero-greeting">Bom dia, Nina</div>
+        <div class="hero-title">Ótica Nina</div>
+        <div class="hero-sub">Terça, 22 de abril de 2026</div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-l">Faturamento</div>
+          <div class="kpi-n">12,8k</div>
+          <div class="kpi-d" style="color:#0284C7;">+18%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Vendas</div>
+          <div class="kpi-n">38</div>
+          <div class="kpi-d" style="color:#34C759;">+5</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Ticket médio</div>
+          <div class="kpi-n">338</div>
+          <div class="kpi-d" style="color:#34C759;">+5%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Novos clientes</div>
+          <div class="kpi-n">14</div>
+          <div class="kpi-d" style="color:#8E8E93;">este mês</div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Hoje na agenda</span>
+        <span style="font-size:10px;font-weight:700;color:#0284C7;cursor:pointer;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="slot">
+          <div class="slot-time">09:30</div>
+          <div class="slot-bar" style="background:#0284C7;"></div>
+          <div><div class="slot-name">Maria da Silva</div><div class="slot-sub">Consulta + armação</div></div>
+        </div>
+        <div class="slot">
+          <div class="slot-time">14:00</div>
+          <div class="slot-bar" style="background:#34C759;"></div>
+          <div><div class="slot-name">João Pereira</div><div class="slot-sub">via WhatsApp · Retirada</div></div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Clientes</span>
+        <span style="font-size:10px;font-weight:700;color:#0284C7;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="row">
+          <div class="av" style="background:#E0F2FE;color:#0284C7;">AP</div>
+          <div class="row-info">
+            <div class="row-name">Ana Paula Mendes</div>
+            <div class="row-sub">5 compras · R$ 3.420</div>
+          </div>
+          <div class="badge" style="background:#E0F2FE;color:#0284C7;">Recorrente</div>
+        </div>
+        <div class="row">
+          <div class="av" style="background:#E8F9EE;color:#219653;">RL</div>
+          <div class="row-info">
+            <div class="row-name">Regina Lima</div>
+            <div class="row-sub">3 compras · R$ 2.100</div>
+          </div>
+          <div class="badge" style="background:#FFF3E0;color:#C47D00;">Inativa</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#0284C7"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span style="color:#0284C7;">Início</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span style="color:#8E8E93;">Clientes</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span style="color:#8E8E93;">Agenda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span style="color:#8E8E93;">Venda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0"/></svg><span style="color:#8E8E93;">Config</span></button>
+      </div>
+    </div>
+    <button class="pick-btn" style="background:#0284C7;" onclick="pick('B','#0284C7','Azul Oceano')">Escolher opção B</button>
+    <div id="chosen-B" class="chosen-banner">Você escolheu o Azul Oceano!</div>
+  </div>
+
+  <!-- ══════ OPÇÃO C — Petróleo #0E7490 ══════ -->
+  <div class="col">
+    <div class="col-label">C — Azul Petróleo</div>
+    <div class="col-hex" style="background:#0E7490;">#0E7490</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.45);text-align:center;">Sofisticado · Único · Atual</div>
+
+    <div class="phone">
+      <div class="status">
+        <span>9:41</span>
+        <span>●●● ▲ ▮▮▮</span>
+      </div>
+      <div class="hero" style="background:#0E7490;">
+        <div class="hero-greeting">Bom dia, Nina</div>
+        <div class="hero-title">Ótica Nina</div>
+        <div class="hero-sub">Terça, 22 de abril de 2026</div>
+      </div>
+      <div class="kpi-row">
+        <div class="kpi">
+          <div class="kpi-l">Faturamento</div>
+          <div class="kpi-n">12,8k</div>
+          <div class="kpi-d" style="color:#0E7490;">+18%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Vendas</div>
+          <div class="kpi-n">38</div>
+          <div class="kpi-d" style="color:#34C759;">+5</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Ticket médio</div>
+          <div class="kpi-n">338</div>
+          <div class="kpi-d" style="color:#34C759;">+5%</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-l">Novos clientes</div>
+          <div class="kpi-n">14</div>
+          <div class="kpi-d" style="color:#8E8E93;">este mês</div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Hoje na agenda</span>
+        <span style="font-size:10px;font-weight:700;color:#0E7490;cursor:pointer;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="slot">
+          <div class="slot-time">09:30</div>
+          <div class="slot-bar" style="background:#0E7490;"></div>
+          <div><div class="slot-name">Maria da Silva</div><div class="slot-sub">Consulta + armação</div></div>
+        </div>
+        <div class="slot">
+          <div class="slot-time">14:00</div>
+          <div class="slot-bar" style="background:#34C759;"></div>
+          <div><div class="slot-name">João Pereira</div><div class="slot-sub">via WhatsApp · Retirada</div></div>
+        </div>
+      </div>
+      <div class="sec-h">
+        <span class="sec-title">Clientes</span>
+        <span style="font-size:10px;font-weight:700;color:#0E7490;">Ver todos</span>
+      </div>
+      <div class="card-list">
+        <div class="row">
+          <div class="av" style="background:#CCFBF1;color:#0E7490;">AP</div>
+          <div class="row-info">
+            <div class="row-name">Ana Paula Mendes</div>
+            <div class="row-sub">5 compras · R$ 3.420</div>
+          </div>
+          <div class="badge" style="background:#CCFBF1;color:#0E7490;">Recorrente</div>
+        </div>
+        <div class="row">
+          <div class="av" style="background:#E8F9EE;color:#219653;">RL</div>
+          <div class="row-info">
+            <div class="row-name">Regina Lima</div>
+            <div class="row-sub">3 compras · R$ 2.100</div>
+          </div>
+          <div class="badge" style="background:#FFF3E0;color:#C47D00;">Inativa</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#0E7490"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span style="color:#0E7490;">Início</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span style="color:#8E8E93;">Clientes</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span style="color:#8E8E93;">Agenda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span style="color:#8E8E93;">Venda</span></button>
+        <button class="nav-btn"><svg viewBox="0 0 24 24" stroke="#8E8E93"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0"/></svg><span style="color:#8E8E93;">Config</span></button>
+      </div>
+    </div>
+    <button class="pick-btn" style="background:#0E7490;" onclick="pick('C','#0E7490','Azul Petróleo')">Escolher opção C</button>
+    <div id="chosen-C" class="chosen-banner">Você escolheu o Azul Petróleo!</div>
+  </div>
+
+</div>
+
+<div id="result" style="display:none;text-align:center;margin-top:40px;">
+  <div style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:6px;">Sua escolha</div>
+  <div id="result-text" style="font-size:22px;font-weight:800;color:white;letter-spacing:-0.5px;"></div>
+  <div id="result-hex" style="font-size:13px;margin-top:4px;color:rgba(255,255,255,0.6);"></div>
+</div>
+
+<script>
+function pick(opt, hex, name) {
+  ['A','B','C'].forEach(o => {
+    document.getElementById('chosen-' + o).style.display = 'none'
+  })
+  document.getElementById('chosen-' + opt).style.display = 'block'
+  document.getElementById('result').style.display = 'block'
+  document.getElementById('result-text').textContent = name + ' escolhido!'
+  document.getElementById('result-hex').textContent = hex
+  document.getElementById('result-text').style.color = hex
+}
+</script>
+</body>
+</html>
