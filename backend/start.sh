@@ -1,6 +1,7 @@
 #!/bin/sh
-set -e
+echo "[start] PORT=$PORT"
 echo "[start] Rodando migrations..."
 alembic upgrade head
-echo "[start] Migrations OK. Iniciando uvicorn na porta $PORT..."
-exec uvicorn app.main:app --host 0.0.0.0 --port "$PORT" --log-level info
+echo "[start] Migracao retornou: $?"
+echo "[start] Iniciando uvicorn na porta ${PORT:-8000}..."
+exec uvicorn app.main:app --host 0.0.0.0 --port "${PORT:-8000}" --log-level debug
