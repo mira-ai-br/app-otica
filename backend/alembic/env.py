@@ -13,7 +13,8 @@ from app.database import Base
 from app.models import Customer, Appointment, Sale, SalePhoto, WhatsappMessage, AppSettings
 
 config = context.config
-config.set_main_option("sqlalchemy.url", os.environ["DATABASE_URL"])
+_db_url = os.environ["DATABASE_URL"].replace("postgresql://", "postgresql+asyncpg://", 1).replace("postgres://", "postgresql+asyncpg://", 1)
+config.set_main_option("sqlalchemy.url", _db_url)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
