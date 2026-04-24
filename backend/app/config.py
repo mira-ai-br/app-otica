@@ -3,8 +3,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     database_url: str
-    supabase_url: str
-    supabase_jwt_secret: str
+    supabase_url: str = ""
+    supabase_jwt_secret: str = ""
     r2_account_id: str = ""
     r2_access_key_id: str = ""
     r2_secret_access_key: str = ""
